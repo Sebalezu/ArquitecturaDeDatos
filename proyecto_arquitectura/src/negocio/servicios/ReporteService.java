@@ -1,4 +1,4 @@
-package servicios;
+package negocio.servicios;
 
 import dominio.Solicitud;
 import java.util.List;
