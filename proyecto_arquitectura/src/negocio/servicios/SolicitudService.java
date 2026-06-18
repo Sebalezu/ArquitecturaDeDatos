@@ -3,16 +3,19 @@ package negocio.servicios;
 import datos.repositorios.interfaces.ISolicitudRepository;
 import datos.repositorios.interfaces.ITipoSolicitudRepository;
 import datos.repositorios.interfaces.IUsuarioRepository;
+import dominio.Notificacion;
 import dominio.Solicitud;
 import dominio.TipoSolicitud;
 import dominio.Usuario;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class SolicitudService {
     private IUsuarioRepository usuarioRepo;
     private ITipoSolicitudRepository tipoSolicitudRepo;
     private ISolicitudRepository solicitudRepo;
+    private int contadorNotificaciones = 1;
 
     public SolicitudService(IUsuarioRepository usuarioRepo, ITipoSolicitudRepository tipoSolicitudRepo, ISolicitudRepository solicitudRepo) {
         this.usuarioRepo = usuarioRepo;
@@ -39,7 +42,7 @@ public class SolicitudService {
         }
 
         try {
-            Solicitud nuevaSolicitud = new Solicitud.Builder()
+           Solicitud nuevaSolicitud = new Solicitud.Builder()
                                         .conId(id)
                                         .conUsuario(usuario)
                                         .conTipo(tipo)
@@ -51,6 +54,8 @@ public class SolicitudService {
 
             System.out.println("Solicitud creada con éxito usando el Builder.");
             System.out.println(nuevaSolicitud.toString());
+
+            generarNotificacion(nuevaSolicitud, "Su solicitud ha sido creada exitosamente.");
 
         } catch (IllegalStateException e) {
             System.out.println("Error al construir la solicitud: " + e.getMessage());
@@ -69,9 +74,24 @@ public class SolicitudService {
             solicitud.cambiarEstado(nuevoEstado);
             solicitudRepo.actualizarEstado(idSolicitud, nuevoEstado);
             System.out.println("Estado actualizado correctamente a: " + nuevoEstado);
+
+            generarNotificacion(solicitud, "El estado de su solicitud ha cambiado a " + nuevoEstado + ".");
+
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    private void generarNotificacion(Solicitud solicitud, String mensaje) {
+        Notificacion notificacion = new Notificacion(
+            contadorNotificaciones++,
+            solicitud,
+            mensaje,
+            LocalDate.now(),
+            solicitud.getEstado()
+        );
+
+        System.out.println(notificacion.toString());
     }
 
     public List<Solicitud> consultarSolicitudesPorEstado(String estado) {

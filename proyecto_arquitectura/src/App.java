@@ -7,6 +7,7 @@ import datos.repositorios.interfaces.ITipoSolicitudRepository;
 import datos.repositorios.interfaces.IUsuarioRepository;
 import negocio.servicios.ReporteService;
 import negocio.servicios.SolicitudService;
+import negocio.servicios.TipoSolicitudService;
 import negocio.servicios.UsuarioService;
 import presentacion.Menu;
 
@@ -28,8 +29,9 @@ public class App {
         UsuarioService usuarioService = new UsuarioService(usuarioRepo);
         SolicitudService solicitudService = new SolicitudService(usuarioRepo, tipoSolicitudRepo, solicitudRepo);
         ReporteService reporteService = new ReporteService();
+        TipoSolicitudService tipoSolicitudService = new TipoSolicitudService(tipoSolicitudRepo);
 
-        Menu menu = new Menu(usuarioService, solicitudService, reporteService, usuarioRepo);
+        Menu menu = new Menu(usuarioService, solicitudService, reporteService, tipoSolicitudService, usuarioRepo);
         menu.iniciar();
     }
 }

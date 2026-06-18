@@ -14,13 +14,39 @@ public class Solicitud {
 
     public void cambiarEstado(String nuevoEstado) {
         String[] estadosValidos = {"CREADA", "EN_REVISION", "APROBADA", "RECHAZADA", "CERRADA"};
+        boolean esValido = false;
         for (String e : estadosValidos) {
             if (e.equals(nuevoEstado)) {
-                this.estado = nuevoEstado;
-                return;
+                esValido = true;
+                break;
             }
         }
-        throw new IllegalArgumentException("Estado no válido: " + nuevoEstado);
+        if (!esValido) {
+            throw new IllegalArgumentException("Estado no válido: " + nuevoEstado);
+        }
+
+        if (!transicionPermitida(this.estado, nuevoEstado)) {
+            throw new IllegalArgumentException("No se permite cambiar de " + this.estado + " a " + nuevoEstado + ".");
+        }
+
+        this.estado = nuevoEstado;
+    }
+
+    private boolean transicionPermitida(String estadoActual, String estadoNuevo) {
+        switch (estadoActual) {
+            case "CREADA":
+                return estadoNuevo.equals("EN_REVISION");
+            case "EN_REVISION":
+                return estadoNuevo.equals("APROBADA") || estadoNuevo.equals("RECHAZADA");
+            case "APROBADA":
+                return estadoNuevo.equals("CERRADA");
+            case "RECHAZADA":
+                return estadoNuevo.equals("CERRADA");
+            case "CERRADA":
+                return false;
+            default:
+                return false;
+        }
     }
 
     public int getId() { return id; }
